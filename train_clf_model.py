@@ -56,7 +56,7 @@ def main():
 	print('Accuracy:', accuracy_score(Y_val, val_pred_class))
 	
 	
-	model_filename = './trained_models/matching_models/matching_model_logreg{}.pckl'.format('_appearance' if args.add_appearance else '')
+	model_filename = './REPP_models/matching_model_logreg{}_new.pckl'.format('_appearance' if args.add_appearance else '')
 	pickle.dump([clf, X_train.columns.tolist()], open(model_filename, 'wb'))
 	print('Model stored in:', model_filename)	
 	
