@@ -132,3 +132,5 @@ dmypy.json
 nohup.out
 *old_*
 *.pckl
+*.txt
+*.json
