@@ -79,14 +79,15 @@ Following commands will apply the REPP post-processing and will evaluate the res
 
 ```
 # YOLO
-python REPP.py --repp_cfg yolo_repp_cfg.json --predictions_file './demos/YOLOv3/predictions/base_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_ILSVRC.txt --store_coco --store_imdb
+python REPP.py --repp_cfg yolo_repp_cfg.json --predictions_file './demos/YOLOv3/predictions/base_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_ILSVRC.txt  --path_dataset /path/to/dataset/ILSVRC2015/ --store_coco --store_imdb
 > {'mAP_total': 0.7506216640807263, 'mAP_slow': 0.825347229618856, 'mAP_medium': 0.742908326433008, 'mAP_fast': 0.5657881762511975}
 
 # FGFA
-python REPP.py --repp_cfg fgfa_repp_cfg.json --predictions_file './demos/Flow-Guided-Feature-Aggregation/predictions/base_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_ILSVRC.txt --store_coco --store_imdb
+python REPP.py --repp_cfg fgfa_repp_cfg.json --predictions_file './demos/Flow-Guided-Feature-Aggregation/predictions/base_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_ILSVRC.txt --path_dataset /path/to/dataset/ILSVRC2015/ --store_coco --store_imdb
 > {'mAP_total': 0.8009014265948871, 'mAP_slow': 0.8741923949671497, 'mAP_medium': 0.7909183123072739, 'mAP_fast': 0.6137783055850773}
 
 # SELSA
+python REPP.py --repp_cfg selsa_repp_cfg.json --predictions_file './demos/Sequence-Level-Semantics-Aggregation/predictions/old_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_ILSVRC.txt --path_dataset /path/to/dataset/ILSVRC2015/ --store_coco --store_imdb
 > {'mAP_total': 0.8421329795837483, 'mAP_slow': 0.8871784038276325, 'mAP_medium': 0.8332090469178383, 'mAP_fast': 0.7109387713303483}
 ```
 
