@@ -15,9 +15,9 @@ REPP improves video detections both for specific Image and Video Object Detector
 
 REPP has been tested with Python 3.6.
 
-Its dependencies can be found the the _requirements.txt_ file.
+Its dependencies can be found the the _repp_requirements.txt_ file.
 
-```pip install -r requirements.txt```
+```pip install -r repp_requirements.txt```
 
 
 ## Quick usage guide
@@ -79,15 +79,14 @@ Following commands will apply the REPP post-processing and will evaluate the res
 
 ```
 # YOLO
-python REPP.py --repp_cfg yolo_repp_cfg.json --predictions_file './demos/YOLOv3/predictions/old_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_ILSVRC.txt --store_coco --store_imdb
+python REPP.py --repp_cfg yolo_repp_cfg.json --predictions_file './demos/YOLOv3/predictions/base_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_ILSVRC.txt --store_coco --store_imdb
 > {'mAP_total': 0.7506216640807263, 'mAP_slow': 0.825347229618856, 'mAP_medium': 0.742908326433008, 'mAP_fast': 0.5657881762511975}
 
 # FGFA
-python REPP.py --repp_cfg fgfa_repp_cfg.json --predictions_file './demos/Flow-Guided-Feature-Aggregation/predictions/old_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_ILSVRC.txt --store_coco --store_imdb
+python REPP.py --repp_cfg fgfa_repp_cfg.json --predictions_file './demos/Flow-Guided-Feature-Aggregation/predictions/base_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_ILSVRC.txt --store_coco --store_imdb
 > {'mAP_total': 0.8009014265948871, 'mAP_slow': 0.8741923949671497, 'mAP_medium': 0.7909183123072739, 'mAP_fast': 0.6137783055850773}
 
 # SELSA
-python REPP.py --repp_cfg selsa_repp_cfg.json --predictions_file './demos/Sequence-Level-Semantics-Aggregation/predictions/old_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_ILSVRC.txt --store_coco --store_imdb
 > {'mAP_total': 0.8421329795837483, 'mAP_slow': 0.8871784038276325, 'mAP_medium': 0.8332090469178383, 'mAP_fast': 0.7109387713303483}
 ```
 
@@ -140,5 +139,7 @@ python train_clf_model.py --add_appearance
 ```
 
 Previous steps include appearance features calculated from a pretrained YOLOv3 model. If you are going to use a different dataset or detection model, it's recommended to omit the _--add_appearance_ parameter.
+
+
 
 
