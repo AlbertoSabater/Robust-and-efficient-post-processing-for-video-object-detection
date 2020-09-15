@@ -79,15 +79,15 @@ Following commands will apply the REPP post-processing and will evaluate the res
 
 ```
 # YOLO
-python REPP.py --repp_cfg yolo_repp_cfg.json --predictions_file './demos/YOLOv3/predictions/old_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_skms-1_mvl2.txt --store_coco --store_imdb
+python REPP.py --repp_cfg yolo_repp_cfg.json --predictions_file './demos/YOLOv3/predictions/old_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_ILSVRC.txt --store_coco --store_imdb
 > {'mAP_total': 0.7506216640807263, 'mAP_slow': 0.825347229618856, 'mAP_medium': 0.742908326433008, 'mAP_fast': 0.5657881762511975}
 
 # FGFA
-python REPP.py --repp_cfg fgfa_repp_cfg.json --predictions_file './demos/Flow-Guided-Feature-Aggregation/predictions/old_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_skms-1_mvl2.txt --store_coco --store_imdb
+python REPP.py --repp_cfg fgfa_repp_cfg.json --predictions_file './demos/Flow-Guided-Feature-Aggregation/predictions/old_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_ILSVRC.txt --store_coco --store_imdb
 > {'mAP_total': 0.8009014265948871, 'mAP_slow': 0.8741923949671497, 'mAP_medium': 0.7909183123072739, 'mAP_fast': 0.6137783055850773}
 
 # SELSA
-python REPP.py --repp_cfg selsa_repp_cfg.json --predictions_file './demos/Sequence-Level-Semantics-Aggregation/predictions/old_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_skms-1_mvl2.txt --store_coco --store_imdb
+python REPP.py --repp_cfg selsa_repp_cfg.json --predictions_file './demos/Sequence-Level-Semantics-Aggregation/predictions/old_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_ILSVRC.txt --store_coco --store_imdb
 > {'mAP_total': 0.8421329795837483, 'mAP_slow': 0.8871784038276325, 'mAP_medium': 0.8332090469178383, 'mAP_fast': 0.7109387713303483}
 ```
 
@@ -96,7 +96,7 @@ Instead of download the base predictions, you can also compute them. To do so, y
 ```
 # YOLO
 cd demos/YOLOv3/
-python get_repp_predictions.py --yolo_path ./pretrained_models/ILSVRC/1203_1758_model_8/ --repp_format --add_appearance --from_annotations ../../data_annotations/annotations_val_skms-1_mvl2.txt --dataset_path /path/to/dataset/ILSVRC2015/Data/VID/
+python get_repp_predictions.py --yolo_path ./pretrained_models/ILSVRC/1203_1758_model_8/ --repp_format --add_appearance --from_annotations ../../data_annotations/annotations_val_ILSVRC.txt --dataset_path /path/to/dataset/ILSVRC2015/Data/VID/
 
 # FGFA
 cd demos/Flow-Guided-Feature-Aggregation/fgfa_rfcn/
