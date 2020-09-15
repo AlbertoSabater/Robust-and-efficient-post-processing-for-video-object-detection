@@ -126,7 +126,9 @@ def get_scores_predictions_and_embeddings(store_filename, base_model, branch_mod
 
     pickle.dump((last_video, preds_video), file_writter)
     preds_video = {}
-    last_video = vid
+    
+    file_writter.close()
+
 
 
 
