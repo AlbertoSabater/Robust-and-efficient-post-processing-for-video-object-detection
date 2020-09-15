@@ -59,15 +59,6 @@ def transform_selsa_results(preds_filename, res, path_dataset):
     # Store predictions by video along with scores vector to post-processing
     # =============================================================================
     
-#    imageset_video_frame = {}
-#    
-#    for frame in frame_data:
-#    	frame, i = frame.split()
-#    	video = '/'.join(frame.split('/')[:-1])
-#    	if video not in imageset_video_frame: imageset_video_frame[video] = {}
-#    	
-#    	imageset_video_frame[video][i] = frame
-    
     
     import pandas as pd
     
@@ -108,9 +99,7 @@ def transform_selsa_results(preds_filename, res, path_dataset):
     		for pred in preds:
     			bbox = pred[:4]
     			scores = pred[4:]
-    #			x1,y1,x2,y2 = bbox		
     
-    #			y_min, x_min, y_max, x_max = bbox
     			x_min, y_min, x_max, y_max = bbox
     			y_min, x_min = max(0, y_min), max(0, x_min)
     			y_max, x_max = min(img_size[1], y_max), min(img_size[0], x_max)
@@ -121,7 +110,6 @@ def transform_selsa_results(preds_filename, res, path_dataset):
     			bbox_center = [ (x_min + width_diff + width/2)/max(iw,ih),
     							  (y_min + height_diff + height/2)/max(iw,ih)]
     			
-    #			if scores.max() < min_score: continue
     		
     			pred = {
     					'image_id': image_id,

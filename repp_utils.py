@@ -26,12 +26,6 @@ def get_video_frame_iterator(filename, from_python_2=False):
 				raise ValueError('Unable to load data ', filename, ':', e)
 		
 		
-# 			try:
-# #				print('Loading')
-# 				yield pickle.load(f) 	 		# , encoding='bytes'
-# 			except EOFError:
-# 				return
-			
 
 def get_pair_features(p1, p2, feat_names=[]): 			# , iw, ih ||| , euclidean_dist=True, correlation=True
 	

@@ -163,11 +163,12 @@ class EYOLO(YOLO):
 			return yolo_eval_raw(self.yolo_model.output, self.anchors,
 					len(self.class_names), self.input_image_shape,
 					score_threshold=self.score)
-		elif self.raw_eval == 'raw_scores':
-			return yolo_eval_raw_scores(self.yolo_model.output, self.anchors,
-					len(self.class_names), self.input_image_shape,
-					score_threshold=self.score)
-		elif 'raw_scores_' in self.raw_eval: 		# ej. raw_scores_16_32
+# 		elif self.raw_eval == 'raw_scores':
+# 			return yolo_eval_raw_scores(self.yolo_model.output, self.anchors,
+# 					len(self.class_names), self.input_image_shape,
+# 					score_threshold=self.score)
+# 		elif 'raw_scores_' in self.raw_eval: 		# ej. raw_scores_16_32
+		elif 'raw_scores' in self.raw_eval: 		# ej. raw_scores_16_32
 			return yolo_eval_raw_scores_feats(self.yolo_model.output, self.anchors,
 					len(self.class_names), self.input_image_shape,
 					list(map(int, self.raw_eval.split('_')[2:])),
