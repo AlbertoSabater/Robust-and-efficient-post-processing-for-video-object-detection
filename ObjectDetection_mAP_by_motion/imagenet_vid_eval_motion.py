@@ -33,14 +33,13 @@ classname_map = ['__background__',  # always index 0
                 'n02062744', 'n02391049']
 
 
-def get_motion_mAP(annotations_filename, preds_filename_imdb, stats_file, 
+def get_motion_mAP(annotations_filename, path_dataset, preds_filename_imdb, stats_file, 
 				   motion_iou_file_orig, imageset_filename_orig, remove_cache=False):
 	
 	if os.path.isfile(stats_file):
 		return json.load(open(stats_file, 'r'))
 		
 	# Get ImageSet from annotations_file
-#	annotations_filename = '/home/asabater/projects/Egocentric_object_detection/dataset_scripts/ilsvrc/{}.txt'.format(annotations_name)
 	imageset_dest_filename = motion_utils.annotations_to_imageset(annotations_filename, store_filename=None)	
 
 	# Create motion file to fit new ImageSet
@@ -48,7 +47,7 @@ def get_motion_mAP(annotations_filename, preds_filename_imdb, stats_file,
 							imageset_filename_orig, imageset_dest_filename)
 	
 	multifiles = False
-	annopath = os.path.join('/home/asabater/projects/ILSVRC2015', 'Annotations', '{0!s}.xml')
+	annopath = os.path.join(path_dataset, 'Annotations', '{0!s}.xml')
 	print('Calculating mAP by motion speed')
 	ap_data = vid_eval_motion(multifiles, preds_filename_imdb, annopath, imageset_dest_filename, classname_map, 
                 motion_iou_dest_filename, remove_cache=remove_cache)
@@ -138,11 +137,8 @@ def vid_eval_motion(multifiles, detpath, annopath, imageset_file, classname_map,
 	# load annotations from cache
 	if not os.path.isfile(annocache):
 		recs = []
-#		for ind, image_filename in enumerate(img_basenames):
 		for ind, image_filename in tqdm(enumerate(img_basenames), total=len(img_basenames)):
 			recs.append(parse_vid_rec(annopath.format('VID/val/' + image_filename), classhash, gt_img_ids[ind]))
-#			if ind % 100 == 0:
-#				print('reading annotations for {:d}/{:d}'.format(ind + 1, len(img_basenames)))
 		print('saving annotations cache to {:s}'.format(annocache))
 		with open(annocache, 'wb') as f:
 			pickle.dump(recs, f)

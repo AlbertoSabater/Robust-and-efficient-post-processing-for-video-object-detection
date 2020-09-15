@@ -134,15 +134,6 @@ def get_scores_predictions_and_embeddings(store_filename, base_model, branch_mod
 
 if __name__ == '__main__':
     
-    """
-    python get_repp_predictions.py --yolo_path ./pretrained_models/ILSVRC/1203_1758_model_8/ --repp_format \
-        --add_appearance --from_annotations ../../data_annotations/annotations_val_skms-1_mvl2.txt \
-        --dataset_path /home/asabater/projects/ILSVRC2015/Data/VID/
-        
-    python get_repp_predictions.py --yolo_path ./pretrained_models/ILSVRC/1203_1758_model_8/ --repp_format \
-        --add_appearance --from_video ./test_images/video_1.mp4
-    """
-    
     
     parser = argparse.ArgumentParser(description='Perform YOLOv3 predictions either from an annotations file or a video')
     parser.add_argument('--yolo_path', required=True, type=str, help='path to the trained YOLO folder')
@@ -163,12 +154,10 @@ if __name__ == '__main__':
     assert not (args.from_annotations is not None and args.dataset_path is None), 'Dataset path of the annotations data must be specified'
     
     
-    # model_folder = './pretrained_models/ILSVRC/1203_1758_model_8/'
     train_params = json.load(open(args.yolo_path + 'train_params.json', 'r'))
     path_weights = args.yolo_path + 'weights/weights.h5'
     image_size = train_params['input_shape']
     
-    # path_dataset = '/home/asabater/projects/ILSVRC2015/Data/VID/'
     
     if not args.repp_format and add_appearance: 
         print(' * REPP format not specified. Suppressing appearance computation')

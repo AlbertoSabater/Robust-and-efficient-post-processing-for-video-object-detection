@@ -27,6 +27,7 @@ def get_video_frame_iterator(filename, from_python_2=False):
 		
 		
 
+# Computes a set of similarity features between two detections
 def get_pair_features(p1, p2, feat_names=[]): 			# , iw, ih ||| , euclidean_dist=True, correlation=True
 	
 	feats = {}

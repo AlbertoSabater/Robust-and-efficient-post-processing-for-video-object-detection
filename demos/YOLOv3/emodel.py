@@ -7,8 +7,6 @@ Created on Mon Mar 25 12:23:38 2019
 """
 
 import os
-#os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID";
-#os.environ["CUDA_VISIBLE_DEVICES"] = ""  
 
 import sys
 sys.path.append('keras_yolo3/')
@@ -34,6 +32,7 @@ from keras.layers.wrappers import TimeDistributed, Bidirectional
 from keras.layers.convolutional_recurrent import ConvLSTM2D
 
 
+# Creates a YOLOv3 model
 def create_model(input_shape, anchors, num_classes, load_pretrained=True, freeze_body=2,
 			weights_path='model_data/yolo_weights.h5', td_len=None, mode=None, spp=False,
 			loss_percs={}):
@@ -47,13 +46,11 @@ def create_model(input_shape, anchors, num_classes, load_pretrained=True, freeze
 	if is_tiny_version:
 		y_true = [Input(shape=(None, None, num_anchors//2, num_classes+5)) for l in range(2)]
 		model_body = tiny_yolo_body(Input(shape=(None,None,3)), num_anchors//2, num_classes)
-	elif td_len is not None and mode is not None:
-		y_true = [Input(shape=(None, None, num_anchors//3, num_classes+5)) for l in range(3)]
-		image_input = Input(shape=(td_len, None, None, 3))
-		model_body = r_yolo_body(image_input, num_anchors//3, num_classes, td_len, mode)
+# 	elif td_len is not None and mode is not None:
+# 		y_true = [Input(shape=(None, None, num_anchors//3, num_classes+5)) for l in range(3)]
+# 		image_input = Input(shape=(td_len, None, None, 3))
+# 		model_body = r_yolo_body(image_input, num_anchors//3, num_classes, td_len, mode)
 	else:
-#		y_true = [Input(shape=(h//{0:32, 1:16, 2:8}[l], w//{0:32, 1:16, 2:8}[l], \
-#						 num_anchors//3, num_classes+5)) for l in range(3)]
 		y_true = [Input(shape=(None, None, num_anchors//3, num_classes+5)) for l in range(3)]
 		image_input = Input(shape=(None, None, 3))
 		model_body = yolo_body(image_input, num_anchors//3, num_classes, spp)
@@ -82,8 +79,6 @@ def create_model(input_shape, anchors, num_classes, load_pretrained=True, freeze
 	return model
 
 
-# =============================================================================
-# =============================================================================
 
 
 def yolo_loss(args, anchors, num_classes, loss_percs={}, ignore_thresh=.5):
@@ -387,6 +382,7 @@ def darknet_body_r(image_input_td, td_len, mode):
 	return x, skip_conn
 
 
+# Default detections generation
 def yolo_eval(yolo_outputs,
 			  anchors,
 			  num_classes,
@@ -471,6 +467,7 @@ def yolo_eval_raw(yolo_outputs,
 	
 
 # Return bounding boxes along with their set of class scores
+# NMS not applied
 def yolo_eval_raw_scores(yolo_outputs,
 			  anchors,
 			  num_classes,
@@ -515,8 +512,8 @@ def yolo_eval_raw_scores(yolo_outputs,
 
 
 
-# TODO: Aplicar non_max_supression???
 # Return boxes, scores and selected feature maps
+# NMS applied
 def yolo_eval_raw_scores_feats(yolo_outputs,
 			  anchors,
 			  num_classes,
@@ -551,247 +548,9 @@ def yolo_eval_raw_scores_feats(yolo_outputs,
 	boxes = K.gather(boxes, nms_index)
 	box_scores = K.gather(box_scores, nms_index)
 	
-##	mask = box_scores >= score_threshold
-#	max_boxes_tensor = K.constant(max_boxes, dtype='int32')
-#	boxes_ = []
-#	scores_ = []
-#	classes_ = []
-#		
-#	# TODO: use keras backend instead of tf.
-#	class_boxes = tf.boolean_mask(boxes, mask[:, c])
-#	class_box_scores = tf.boolean_mask(box_scores[:, c], mask[:, c])
-#	nms_index = tf.image.non_max_suppression(
-#		class_boxes, class_box_scores, max_boxes_tensor, iou_threshold=iou_threshold)
-#	class_boxes = K.gather(class_boxes, nms_index)
-#	class_box_scores = K.gather(class_box_scores, nms_index)
-#	classes = K.ones_like(class_box_scores, 'int32') * c
-#	boxes_.append(class_boxes)
-#	scores_.append(class_box_scores)
-#	classes_.append(classes)
-#		
-#		
-#	boxes_ = K.concatenate(boxes_, axis=0)
-#	scores_ = K.concatenate(scores_, axis=0)
-#	classes_ = K.concatenate(classes_, axis=0)
 	
 	
 	return boxes, box_scores, yolo_outputs[num_layers:]
-
-
-# %%
-
-if False:
-	# %%
-
-	# concat connections at 92, 152 -> 4, 64
-	
-	
-	td_len = 5 
-	img_size = 320
-	#image_input = Input(shape=(320, 320, 3))		# (320, 320, 3)
-	image_input_td = Input(shape=(td_len, img_size, img_size, 3))
-	#r_darknet = Model(image_input_td, r_darknet_body(image_input, image_input_td))
-	r_darknet, skip_conn = darknet_body_r(image_input_td, td_len, mode='3d')
-	r_darknet = Model(image_input_td, r_darknet)
-	
-	r_darknet.summary()
-	
-	
-	# %%
-	
-	img_size = 416
-	input_shape = (img_size,img_size)
-	num_anchors = 9
-	num_classes = 7
-	
-	K.clear_session() # get a new session
-	image_input = Input(shape=(img_size,img_size, 3))		 # (None, None, 3)
-	h, w = input_shape
-	#num_anchors = len(anchors)
-	
-	y_true = [Input(shape=(h//{0:32, 1:16, 2:8}[l], w//{0:32, 1:16, 2:8}[l], \
-		num_anchors//3, num_classes+5)) for l in range(3)]
-		
-		
-	darknet = Model(image_input, darknet_body(image_input, spp=False))
-	darknet_spp = Model(image_input, darknet_body(image_input, spp=True))
-	yolo = yolo_body(image_input, num_anchors//3, num_classes, spp=True)
-	
-#	body_darknet = yolo_body(image_input, num_anchors//3, num_classes)
-	
-	# %%
-	
-	print(darknet.layers[152])
-	print(darknet_spp.layers[152])
-	print(yolo.layers[152])
-	print(darknet.layers[92])
-	print(darknet_spp.layers[92])
-	print(yolo.layers[92])
-	
-	# %%
-	
-	from keras.models import model_from_json
-	from keras.utils import plot_model
-	import json
-	
-	img_size = 416
-	num_anchors = 9
-	num_classes = 7
-	image_input = Input(shape=(img_size,img_size, 3))		 # (None, None, 3)
-	yolo_spp = yolo_body(image_input, num_anchors//3, num_classes, spp=True)
-	orig_spp = model_from_json(json.load(open('weights/spp.json', 'r')))
-	plot_model(yolo_spp, to_file='yolo_spp.png', show_shapes=True)
-	plot_model(orig_spp, to_file='orig_spp.png', show_shapes=True)
-
-	
-	# %%
-	
-	for i in range(len(yolo_spp.layers)):
-		if yolo_spp.layers[i].name != orig_spp.layers[i].name:
-			print(i, yolo_spp.layers[i].name, orig_spp.layers[i].name)
-		elif 'conv' in yolo_spp.layers[i].name:
-			l1, lo = yolo_spp.layers[i], orig_spp.layers[i]
-			if not (l1.strides == lo.strides and l1.kernel_size == lo.kernel_size and 
-		   l1.input.shape[-1] == lo.input.shape[-1] and l1.filters == lo.filters):
-				print(i)
-				print(i, l1.name, '\t\t', l1.strides,l1.kernel_size, l1.filters, '\t\t', l1.input.shape.as_list())
-				print(i, lo.name, '\t\t', lo.strides,lo.kernel_size, lo.filters, '\t\t', lo.input.shape.as_list())
-		elif 'pool' in yolo_spp.layers[i].name:
-			l1, lo = yolo_spp.layers[i], orig_spp.layers[i]
-			print(i)
-			print(i, l1.name, l1.pool_size, l1.strides)
-			print(i, lo.name, lo.pool_size, lo.strides)
-		
-			
-	# %%
-	
-	for i,l in enumerate(orig_spp.layers):
-		if 'conv' in l.name:
-			print(i, l.name, '\t\t', l.strides,l.kernel_size, l.filters, '\t\t', l.input.shape.as_list())
-		elif 'add_' in l.name or 'concat' in l.name:
-			print(i, l.name, '\t\t\t\t\t\t', [ l.shape.as_list() for l in l.input ])
-		else:
-			print(i, l.name, '\t\t\t\t\t\t', l.input.shape.as_list())
-	
-	
-	# %%
-	
-	img_size = 19
-	image_input = Input(shape=(img_size,img_size, 3))		 # (None, None, 3)
-	x = ZeroPadding2D(((1,0),(1,0)))(image_input)
-	x = DarknetConv2D_BN_Leaky(512, (1,1), strides=(1,1))(x)
-	x = DarknetConv2D_BN_Leaky(1024, (3,3), strides=(1,1))(x)
-	x = DarknetConv2D_BN_Leaky(512, (1,1), strides=(1,1))(x)
-	
-	mp5 = MaxPooling2D(pool_size=(5,5), strides=(1,1), padding='same')(x)
-	mp9 = MaxPooling2D(pool_size=(9,9), strides=(1,1), padding='same')(x)
-	mp13 = MaxPooling2D(pool_size=(13,13), strides=(1,1), padding='same')(x)
-	x = Concatenate()([x, mp5, mp9, mp13])
-
-	x = DarknetConv2D_BN_Leaky(512, (1,1), strides=(1,1))(x)
-	x = DarknetConv2D_BN_Leaky(1024, (3,3), strides=(1,1))(x)
-	x = DarknetConv2D_BN_Leaky(512, (1,1), strides=(1,1))(x)
-	x = DarknetConv2D_BN_Leaky(1024, (3,3), strides=(1,1))(x)
-	x = Model(image_input, x)
-	
-	
-	#%%
-	
-	#print(r_darknet.summary())
-	
-	# concat connections at 92, 152 -> 4, 64
-	
-	skip_conn_r = skip_conn
-	#skip_conn_r = [6,66]
-	print('darknet	  |||', darknet.layers[92].name, darknet.layers[92].output)
-	print('r_darknet	|||', r_darknet.layers[skip_conn_r[0]].name, r_darknet.layers[skip_conn_r[0]].output)
-	print('body_darknet |||', body_darknet.layers[skip_conn_r[0]].name, body_darknet.layers[skip_conn_r[0]].output)
-	
-	print('darknet	  |||', darknet.layers[152].name, darknet.layers[152].output)
-	print('r_darknet	|||', r_darknet.layers[skip_conn_r[1]].name, r_darknet.layers[skip_conn_r[1]].output)
-	print('body_darknet |||', body_darknet.layers[skip_conn_r[1]].name, body_darknet.layers[skip_conn_r[1]].output)
-	
-	
-	# %%
-	
-	img_size = None
-	num_anchors = 9
-	num_classes = 7
-	td_len = 5 
-	
-	K.clear_session() # get a new session
-	#image_input = Input(shape=(None,None, 3))		 # (None, None, 3)
-	image_input_td = Input(shape=(td_len, img_size,img_size, 3))
-	#num_anchors = len(anchors)
-	
-	#input_shape = (img_size,img_size)
-	#h, w = input_shape
-	#y_true = [Input(shape=(h//{0:32, 1:16, 2:8}[l], w//{0:32, 1:16, 2:8}[l], \
-	#	num_anchors//3, num_classes+5)) for l in range(3)]
-		
-		
-	model = r_yolo_body(image_input_td, num_anchors//3, num_classes, td_len, 'lstm')
-	model.summary()
-	
-	
-	# %%
-	
-	num_classes = 7
-	path_anchors = 'base_models/yolo_anchors.txt'
-	path_weights = 'base_models/yolo.h5'
-	anchors = ktrain.get_anchors(path_anchors)
-	img_size = 320
-	model = None
-	
-	td_len = 3
-	model = create_model((img_size,img_size), anchors, num_classes, load_pretrained=True, freeze_body=2,
-				weights_path=path_weights, td_len=5, mode='bilstm')
-
-	
-	# %%
-	
-	num_classes = 7
-	path_anchors = 'base_models/yolo_anchors.txt'
-	path_weights = 'base_models/yolo.h5'
-	anchors = ktrain.get_anchors(path_anchors)
-	img_size = 416
-	
-	model = create_model((img_size,img_size), anchors, num_classes, load_pretrained=False, freeze_body=0,
-				weights_path=path_weights)
-	
-	# %%
-	
-	del model.layers[-4:]
-	model = Model(model.input, (model.layers[-3].output, model.layers[-2].output, model.layers[-1].output))
-	
-	boxes, scores, classes = yolo_eval(model.output, anchors, num_classes, 
-									(img_size, img_size), score_threshold=0., iou_threshold=0.5)
-	
-	# %%
-	
-	for img_size in [320, 416, 608]:
-		td_data = np.concatenate([ np.random.rand(1, 1, img_size, img_size, 3) for i in range(td_len) ], axis=1)
-		if td_len == 1: td_data = td_data[0,::]
-		
-	#	out_boxes, out_scores, out_classes = self.sess.run(
-	#			[self.boxes, self.scores, self.classes],
-	#			feed_dict={
-	#				self.yolo_model.input: image_data,
-	#				self.input_image_shape: [image.size[1], image.size[0]],
-	#				K.learning_phase(): 0
-	#			})
-		
-		pred = model.predict(td_data)
-		for p in pred: print(p.shape)
-		print('='*20)
-
-
-# %%
-
-	for i, l in enumerate(model.layers):
-		if not l.trainable:
-			print(i, l)
-
 
 
 

@@ -32,10 +32,9 @@ import tensorflow as tf
 import keras.backend.tensorflow_backend as ktf
 
 
-MIN_SCORE = 0.00005
 
 
-
+# Creates and initializes the YOLOv3 backbone for the feature maps extraction
 def get_backbone(path_weights=None, downsample_rate=32):
 
 	dummy_img = Input(shape=(None,None,3), name='dummy_img')
@@ -65,8 +64,10 @@ def get_backbone(path_weights=None, downsample_rate=32):
 
 	return backbone
 
-def get_branch_body(pool_size, downsample_rate, emb_len, use_roi_layer):
 
+# Creates the appearance embedding model generator
+# Unused?
+def get_branch_body(pool_size, downsample_rate, emb_len, use_roi_layer):
 	
 	if use_roi_layer:
 		backbone_output = Input(shape=(None,None,1024//(32//downsample_rate)))
@@ -77,14 +78,9 @@ def get_branch_body(pool_size, downsample_rate, emb_len, use_roi_layer):
 	else:
 		roi_input = Input(shape=(pool_size, pool_size, 1024//(32//downsample_rate)))
 		branch_body = roi_input
-	
 		branch_body = Lambda(lambda x: x)(branch_body)
-		
 		branch_body = GlobalAveragePooling2D()(branch_body)
-		
 		branch_body = Dense(emb_len)(branch_body)
-		
-		
 		
 	branch_body = Lambda(lambda x: K.l2_normalize(x, axis=-1), name='normalize')(branch_body)
 	
@@ -99,6 +95,7 @@ def get_branch_body(pool_size, downsample_rate, emb_len, use_roi_layer):
 
 
 
+# Unused?
 def get_embs(backbone, branch_body, downsample_rate, use_roi_layer, pool_size, name):
 	inp_roi = Input(shape=(1, 4), name='roi_{}'.format(name))
 	
@@ -121,6 +118,7 @@ def get_embs(backbone, branch_body, downsample_rate, use_roi_layer, pool_size, n
 		return branch, inp_img
 
 
+# Unused?
 def get_triplet_model(path_weights, downsample_rate, pool_size, emb_len, gap, use_backbone, use_roi_layer, branch_type, **kwargs):
 	if use_backbone: backbone = get_backbone(path_weights, downsample_rate)
 	else: backbone = None
@@ -162,36 +160,6 @@ def triplet_loss(y_true, y_pred, alpha = .2):
 
 
 
-# def load_yolo_model_raw(path_results, dataset_name, model_num, best_weights, 
-# 						downsampled_outputs, image_size, score=MIN_SCORE, iou_thr=0.5, max_boxes=20):
- 	
-#  	model_folder = train_utils.get_model_path(path_results, dataset_name, model_num)
-#  	train_params = json.load(open(model_folder + 'train_params.json', 'r'))
- 	
-#  	raw_eval = 'raw_scores_' + '_'.join(map(str, downsampled_outputs))
-
-#  	if best_weights:
-# 		model_path = train_utils.get_best_weights(model_folder)
-#  	else:
-# 		model_path = model_folder + 'weights/trained_weights_final.h5'
- 	
-#  	model = EYOLO(
-#  			model_image_size = image_size,
-#  			model_path = model_path,
-#  			classes_path = train_params['path_classes'],
-#  			anchors_path = train_params['path_anchors'],
-#  			score = score,
-#  			iou = iou_thr,	  # 0.5
-#  			td_len = train_params.get('td_len', None),
-#  			mode = train_params.get('mode', None),
-#  			spp = train_params.get('spp', False),
-#  			raw_eval = raw_eval,
-#  			max_boxes = max_boxes
-# 		)
- 	
-#  	return model, train_params, model_folder
-
-
 def load_branch_body(model_folder_roi):
 	
 	# Load architecture
@@ -199,7 +167,6 @@ def load_branch_body(model_folder_roi):
 	branch_body = model_from_json(model_arch, {'RoiPoolingConv': RoiPoolingConv})
 	model_params = json.load(open(model_folder_roi+'train_params.json', 'r'))
 	downsample_rate = model_params['downsample_rate']
-
 
 	
 	# Load weights
@@ -226,6 +193,7 @@ def load_branch_body(model_folder_roi):
 	return branch_body
 
 
+# Unused?
 def load_set_of_branches(path_roi_models):
 	
 	inp_bck = Input(shape=(None,None,32*downsample_rate))

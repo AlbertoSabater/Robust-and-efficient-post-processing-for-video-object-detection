@@ -35,35 +35,7 @@ import json
 
 
 
-
-# def load_yolo_model_raw(path_results, dataset_name, model_num, best_weights, 
-# 						downsampled_outputs, image_size, score=MIN_SCORE, iou_thr=0.5, max_boxes=20):
- 	
-#  	model_folder = train_utils.get_model_path(path_results, dataset_name, model_num)
-#  	train_params = json.load(open(model_folder + 'train_params.json', 'r'))
- 	
-#  	raw_eval = 'raw_scores_' + '_'.join(map(str, downsampled_outputs))
-
-#  	if best_weights:
-# 		model_path = train_utils.get_best_weights(model_folder)
-#  	else:
-# 		model_path = model_folder + 'weights/trained_weights_final.h5'
- 	
-# 	 model = EYOLO(
-# 		model_image_size = image_size,
-# 		model_path = path_weights,
-# 		classes_path = train_params['path_classes'],
-# 		anchors_path = train_params['path_anchors'],
-# 		score = score,
-# 		iou = iou_thr,
-# 		spp = train_params.get('spp', False),
-# 		raw_eval = raw_eval,
-# 		max_boxes = max_boxes
-# 	)
-
-#  	return model, train_params, model_folder
-
-
+# Load a YOLO model and its weights from a model folder
 def load_yolo_model_raw(model_folder, path_weights, image_size, scores_vector,
 						downsample_rate, score=0.005, iou_thr=0.5, max_boxes=20):
 

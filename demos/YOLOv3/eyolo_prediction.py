@@ -12,8 +12,6 @@ from eyolo import EYOLO, detect_video
 from PIL import Image
 
 import os
-#os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID";
-#os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 def detect_img(yolo, img, output_path=""):
 	print('***', img)

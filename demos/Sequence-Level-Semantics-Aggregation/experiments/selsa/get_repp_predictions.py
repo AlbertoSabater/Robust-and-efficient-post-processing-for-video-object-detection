@@ -51,7 +51,6 @@ def transform_selsa_results(preds_filename, res, path_dataset):
     preds_frame = res[0][0][0]
     image_ids = res[0][1]
     
-    #imageset_filename = './data/ILSVRC/ImageSets/VID_val_frames.txt'
     with open(path_dataset + 'ImageSets/VID_val_videos_eval.txt', 'r') as f: frame_data = f.read().splitlines()
     
     
@@ -75,7 +74,6 @@ def transform_selsa_results(preds_filename, res, path_dataset):
     
     from PIL import Image
     
-    #store_filename = '/mnt/hdd/egocentric_results/ilsvrc/SELSA/preds_raw_scores_aug_score{}.pckl'.format(min_score)
     store_filename = preds_filename.replace('.pckl', '_repp.pckl').replace('_raw_', '_').replace('/res', '/preds')
     store_file = open(store_filename, 'wb')
     
@@ -85,11 +83,9 @@ def transform_selsa_results(preds_filename, res, path_dataset):
     	for ind, r in g.iterrows():
     		
     		preds = r.preds
-    #		preds = preds_frame[r.pred_id-1]
     		image_id = r.frame
     		frame_num = image_id.split('/')[-1]
     	
-#      		image = Image.open(path_dataset + 'val/' + image_id + '.JPEG')
       		image = Image.open(path_dataset + '/Data/VID/' + image_id + '.JPEG')
     		img_size = image.size
     		ih, iw = img_size[::-1]
@@ -120,7 +116,6 @@ def transform_selsa_results(preds_filename, res, path_dataset):
     
     			if frame_num in preds_video_frame: preds_video_frame[frame_num].append(pred)
     			else: preds_video_frame[frame_num] = [pred]
-    #			print(bbox)
     
     	preds_video_frame = {k: preds_video_frame[k] for k in sorted(preds_video_frame)}
     	pickle.dump(('val/' + vid, preds_video_frame), store_file)
@@ -132,13 +127,9 @@ def transform_selsa_results(preds_filename, res, path_dataset):
 
   
     
-#orig_pred = True
-#thresh=1e-3
 def run_selsa():
     def parse_args():
         parser = argparse.ArgumentParser(description='Test a Faster R-CNN network')
-        # general
-#        parser.add_argument('--cfg', default=cfg_path,
         parser.add_argument('--cfg', default='experiments/selsa/cfgs/resnet_v1_101_rcnn_selsa_aug.yaml',
                             help='experiment configure file name', type=str)
     
@@ -161,26 +152,15 @@ def run_selsa():
         return args
     
     args = parse_args()
-    #curr_path = os.path.abspath(os.path.dirname(__file__))
-    #sys.path.insert(0, os.path.join(curr_path, '../external/mxnet', config.MXNET_VERSION))
-    #sys.path.insert(0, os.path.join(curr_path, '../..'))
-    
     
     config.gpus = '0'
     ctx = [mx.gpu(int(i)) for i in config.gpus.split(',')]
     
     print(args)
     
-    # if args.sample_stride != -1:
-    #     config.TEST.sample_stride = args.sample_stride
-    # if args.key_frame_interval != -1:
-    #     config.TEST.KEY_FRAME_INTERVAL = args.key_frame_interval
-    # if args.video_shuffle:
-    #     config.TEST.video_shuffle = args.video_shuffle
      
     logger, final_output_path, tb_log_path = create_logger(config.output_path, config.log_path, args.cfg,
                                                                config.dataset.test_image_set)
-     
     
     trained_model = os.path.join(final_output_path, '..', '_'.join(
             [iset for iset in config.dataset.image_set.split('+')]),
@@ -190,12 +170,6 @@ def run_selsa():
     if args.test_pretrained:
         trained_model = args.test_pretrained
         test_epoch = 0
-    
-    
-    
-    ## %%
-    
-
     
     cfg = config
     cfg_path = args.cfg
@@ -212,13 +186,9 @@ def run_selsa():
     feat_sym = feat_sym_instance.get_feat_symbol(cfg)
     aggr_sym = aggr_sym_instance.get_aggregation_symbol(cfg)
     
-    
-#    config.dataset.test_image_set = 'VID_val_videos_short'
-    
     dataset = config.dataset.dataset
     image_set = config.dataset.test_image_set
     root_path = config.dataset.root_path
-#    dataset_path = '/home/asabater/projects/ILSVRC2015/'                  # config.dataset.dataset_path
     dataset_path = args.dataset_path                  # config.dataset.dataset_path
     motion_iou_path = config.dataset.motion_iou_path
     output_path = None
@@ -249,7 +219,6 @@ def run_selsa():
     test_datas = [TestLoader(x, cfg, batch_size=1, shuffle=args.shuffle, video_shuffle=cfg.TEST.video_shuffle,
                              has_rpn=config.TEST.HAS_RPN) for x in roidbs]
         
-        
      
     from function.test_rcnn import get_predictor
     
@@ -274,7 +243,6 @@ def run_selsa():
 
         
     t = time.time()
-#    store_filename = '/mnt/hdd/egocentric_results/ilsvrc/SELSA/res_{}_{}_raw_aug_score{}_op{}.pckl'.format(
     store_filename = './predictions/res_{}_{}_raw_score{}_op{}.pckl'.format(
             config.dataset.test_image_set, cfg_path.split('/')[-1][:-5], thresh, orig_pred)
     print(store_filename)
@@ -293,7 +261,6 @@ def run_selsa():
         
         print(' ** Transform SELSA predictions to REPP format')
     transform_selsa_results(store_filename, res, args.dataset_path)
-        
     
     if orig_pred:
         info_str = imdb.evaluate_detections_multiprocess(res)

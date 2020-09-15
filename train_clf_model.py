@@ -12,6 +12,10 @@ from sklearn.metrics import accuracy_score
 import argparse
 
 
+# =============================================================================
+# Trains the Logistic Regression model for the detections linking
+# =============================================================================
+
 
 def main():
 	
@@ -23,14 +27,6 @@ def main():
 	args = parser.parse_args()
 	
 	
-# 	path_dataset_train = './data_annotations/triplet_annotations/matching_models_dataset_train_appearance.pckl'
-# 	path_dataset_val = './data_annotations/triplet_annotations/matching_models_dataset_val_appearance.pckl'
-	
-	# path_dataset_train = './data_annotations/triplet_annotations/matching_models_dataset_train.pckl'
-	# path_dataset_val = './data_annotations/triplet_annotations/matching_models_dataset_val.pckl'
-# 	add_appearance = True
-	
-		
 	print('Loading datasets')
 	X_train, Y_train = pickle.load(open(args.path_dataset_train, 'rb'))
 	X_val, Y_val = pickle.load(open(args.path_dataset_val, 'rb'))

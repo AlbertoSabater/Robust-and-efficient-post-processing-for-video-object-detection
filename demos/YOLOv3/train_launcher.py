@@ -7,8 +7,6 @@ Created on Wed Jun 12 17:40:46 2019
 """
 
 import os
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID";
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"  
 
 import train
 import time

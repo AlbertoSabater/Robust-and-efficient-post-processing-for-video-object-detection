@@ -20,9 +20,19 @@ from data_annotations.imagenet_vid_classes import classes_map
 np.random.seed(0)
 
 
+# =============================================================================
+# Creates a set of triplet annotations (Anchor, Positive, Negative) from
+# ILSVRC original annotations
+# These annotations are used to train the Logistic Regression REPP linking model
+# and optionally the appearance embedding descriptor model
+# =============================================================================
+
+
 N_PERC_CHANGE_TO_VIDEO = 0.1
 N_PERC_CHANGE_TO_TRACK = 0.1
 
+
+# Reads and parses Imagenet VID metadata
 def get_video_bndbox(annotations_dir, video, frame, mode):
 	doc =  minidom.parse(annotations_dir + '/' + video + '/' + frame)
 	
@@ -32,7 +42,6 @@ def get_video_bndbox(annotations_dir, video, frame, mode):
 	size = doc.getElementsByTagName('size')[0]
 	width = size.getElementsByTagName('width')[0].firstChild.data
 	height = size.getElementsByTagName('height')[0].firstChild.data
-	
 	
 	objs = doc.getElementsByTagName("object")
 	
@@ -70,8 +79,6 @@ def get_folder_bndbox(annotations_dir, video, mode):
 	return sum([ get_video_bndbox(annotations_dir, video, frame, mode) for frame in frames ], [])
 
 
-
-
 def get_bboxes_val(annotations_dir):
 	bboxes = []
 	videos = os.listdir(annotations_dir)
@@ -94,7 +101,7 @@ def get_bboxes_train(annotations_dir):
 	
 
 
-
+# Generates random triplet annotations
 def get_annotations(bboxes, path_dataset, mode, num_samples, max_frame_dist):
 	bboxes_df = pd.DataFrame(bboxes)
 
@@ -121,14 +128,13 @@ def get_annotations(bboxes, path_dataset, mode, num_samples, max_frame_dist):
 		img_A = sample_A.img.iloc[0]
 		num_frame_A = sample_A.num_frame.iloc[0]
 		
-		# Positive: mismo track, imagen cercana a A, diferente de A
+		# Positive: same track, close frame to A, different from A
 		opts_P = bboxes_df[(bboxes_df.track_id == track_A) \
 					 & (bboxes_df.num_frame > num_frame_A-max_frame_dist)\
 					 & (bboxes_df.num_frame < num_frame_A+max_frame_dist)\
 					 & (bboxes_df.img != img_A) ]
 		if len(opts_P) == 0: 
 			empty_P.append(track_A)
-# 			print('P. No same track', track_A)
 			return None
 		else: sample_P = opts_P.sample(1)
 		
@@ -165,7 +171,6 @@ def get_annotations(bboxes, path_dataset, mode, num_samples, max_frame_dist):
 		if sample is not None: 
 			samples.append(sample); count += 1; pbar.update(1)
 		else:
-# 			print('NONE')
 			pass
 
 
@@ -187,7 +192,6 @@ def get_annotations(bboxes, path_dataset, mode, num_samples, max_frame_dist):
 
 
 
-# %%
 
 def main():
 	parser = argparse.ArgumentParser(description='Creates the set of triplet annotations.')
@@ -199,7 +203,6 @@ def main():
 	args = parser.parse_args()
 		
 		
-	# path_dataset = '/home/asabater/projects/ILSVRC2015/'
 	
 	annotations_dir = args.path_dataset + '/Annotations/VID/{}/'
 	mode = 'val'
@@ -212,12 +215,7 @@ def main():
 	print('='*80)
 	
 	
-	# %%
-	
 	np.random.seed(0)
-	# num_train, num_val = 50000, 8000
-	# num_train, num_val = 200, 200
-	# max_frame_dist = 25
 	
 	mode = 'train'
 	print('Generating train triplets annotations')
@@ -230,7 +228,6 @@ def main():
 	bboxes_df_val, anns_val = get_annotations(bboxes_val, path_dataset='', 
 											  mode=mode, num_samples=args.num_samples_val, 
 											  max_frame_dist=args.max_frame_dist)
-
 
 
 if __name__ == '__main__':

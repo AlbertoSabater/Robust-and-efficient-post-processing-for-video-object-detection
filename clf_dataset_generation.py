@@ -14,7 +14,6 @@ sys.path.append('demos/YOLOv3/keras_yolo3/yolo3/')
 
 from roi_data_generator import data_generator_wrapper, get_random_data_cv2
 
-# from evaluate_model import MIN_SCORE
 import datetime
 from tqdm import tqdm
 import pandas as pd
@@ -32,22 +31,17 @@ import argparse
 
 
 # =============================================================================
-# Script to build dataset made of features from positive and negative ROIS to anchor
-# Used to train clasification model
+# Script to build a dataset made of features from triplet annotations (Anchor, Positive, Negative)
+# Used to train a clasification model for the REPP linking Logistic Regression
 # =============================================================================
-
 
 from repp_utils import get_pair_features
 
 
 
-
-
-# # Input feats: IOU, wA/wN, hA/hN, distasnce between centers, distance between centers / w/h,
-# # euclidean ROI descriptors distance
-# # Cannot use scores dot product -> difficult of getting it from gt ROIS
-
-# TODO: turn rnadom to True
+# Input feats: IOU, wA/wN, hA/hN, distasnce between centers, distance between centers / w/h,
+# euclidean ROI descriptors distance
+# Cannot use scores dot product -> difficult of getting it from gt ROIS
 def get_and_store_dataset_aug(path_annotations, path_dataset, input_shape, backbone, branch_model, downsample_rate, random, mode):
     
     store_dir = './data_annotations/triplet_annotations/matching_models_dataset_{}{}.pckl'.format(mode,
@@ -71,7 +65,7 @@ def get_and_store_dataset_aug(path_annotations, path_dataset, input_shape, backb
                     (roi_boxes[i][0][1] + (roi_boxes[i][0][3]/2)) * downsample_rate / input_shape[0]))
             
             
-        if branch_model is not None:
+        if branch_model is not None:        # Add appearance features
             embs = []
             for img, roi_box in zip(imgs, roi_boxes):
                 roi_box[:, 2] = max(1., roi_box[:, 2]); roi_box[:, 3] = max(1., roi_box[:, 3])
@@ -92,7 +86,7 @@ def get_and_store_dataset_aug(path_annotations, path_dataset, input_shape, backb
                                           'bbox_center': bbox_centers[0]},
                                          {'bbox': sample_data[5][0].copy(), 'emb': embs[2],
                                           'bbox_center': bbox_centers[2]}, feat_names) ])
-        else:
+        else:                           # No add appearance features
             feat_embs.append(
                     [ get_pair_features({'bbox': sample_data[3][0].copy(),
                                           'bbox_center': bbox_centers[0]},
@@ -109,10 +103,6 @@ def get_and_store_dataset_aug(path_annotations, path_dataset, input_shape, backb
     X += [ N for A,N in feat_embs ]; Y += [0]*len(feat_embs)
     X = pd.DataFrame(X); np.array(Y)
 
-#         store_dir = prm + '/roi_clsf_models/{}/{}{}.pckl'.format(dataset_name, 
-#                                          path_annotations[:-4].split('/')[-1].replace('annotations', 'dataset'),
-#                                          '' if random else '_norand')
-
     if not os.path.isdir('/'.join(store_dir.split('/')[:-1])):
         os.makedirs('/'.join(store_dir.split('/')[:-1]))
     pickle.dump([X,Y], open(store_dir, 'wb'))    
@@ -121,7 +111,6 @@ def get_and_store_dataset_aug(path_annotations, path_dataset, input_shape, backb
 
 
 
-#%%
 
 def main():
     parser = argparse.ArgumentParser(description='Creates the dataset to train the matching classifier from triplet annotations')
@@ -143,21 +132,8 @@ def main():
     
     if add_appearace_similarity:
         
-        import tensorflow as tf
-        import keras.backend.tensorflow_backend as ktf
-        
         import roi_nn
         import train_utils
-
-        os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID";
-        os.environ["CUDA_VISIBLE_DEVICES"] = "0";  
-
-        def get_session(gpu_fraction=0.90):
-            gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=gpu_fraction,
-                                        allow_growth=True)
-            return tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
-        ktf.set_session(get_session())
-
 
         base_path_model = './demos/YOLOv3/pretrained_models/ILSVRC/1203_1758_model_8/'
         path_roi_model = base_path_model + 'embedding_model/'
@@ -168,14 +144,11 @@ def main():
     
     np.random.seed(0)
     
-    # path_annotations = './demos/YOLOv3/__test_roi_embeddings/ilsvrc/roi_annotations_ilsvrc_val_drNone_psNone_ns8000_mfd25.txt'
     path_annotations = './data_annotations/triplet_annotations/triplet_annotations_train.txt'
     get_and_store_dataset_aug(path_annotations, path_dataset, image_size, backbone, branch_model, downsample_rate, rndm, 'train')
             
-    # path_annotations = './demos/YOLOv3/__test_roi_embeddings/ilsvrc/roi_annotations_ilsvrc_train_drNone_psNone_ns50000_mfd25.txt'
     path_annotations = './data_annotations/triplet_annotations/triplet_annotations_val.txt'
     get_and_store_dataset_aug(path_annotations, path_dataset, image_size, backbone, branch_model, downsample_rate, rndm, 'val')
-
 
 
 if __name__ == '__main__': main()

@@ -17,6 +17,10 @@ from ObjectDetection_mAP_by_motion import motion_utils
 
 INF = 9e15
 
+# =============================================================================
+# Robust and Efficient Post-Processing for Video Object Detection (REPP)
+# =============================================================================
+
 
 
 class REPP():
@@ -28,19 +32,19 @@ class REPP():
               annotations_filename = '',
               **kwargs):
         
-        self.min_tubelet_score = min_tubelet_score
-        self.min_pred_score = min_pred_score
-        self.add_unmatched = add_unmatched
+        self.min_tubelet_score = min_tubelet_score      # threshold to filter out low-scoring tubelets
+        self.min_pred_score = min_pred_score            # threshold to filter out low-scoring base predictions
+        self.add_unmatched = add_unmatched              # True to add unlinked detections to the final set of detections. Leads to a lower mAP
 
-        self.distance_func = distance_func
-        self.clf_thr = clf_thr                       # score threshold to filter_out predictions
-        self.clf_mode = clf_mode
-        self.appearance_matching = appearance_matching
+        self.distance_func = distance_func              # LogReg to use the learning-based linking model. 'def' to use the baseline from SBM
+        self.clf_thr = clf_thr                          # threshold to filter out detection linkings
+        self.clf_mode = clf_mode                        # Relation between the logreg score and the semmantic similarity. 'dot' recommended
+        self.appearance_matching = appearance_matching  # True to use appearance similarity features
 
-        self.recoordinate = recoordinate
-        self.recoordinate_std = recoordinate_std
-        self.store_coco = store_coco
-        self.store_imdb = store_imdb
+        self.recoordinate = recoordinate                # True to perform a recordinating step
+        self.recoordinate_std = recoordinate_std        # Strength of the recoordinating step
+        self.store_coco = store_coco                    # True to store predictions with the COCO format
+        self.store_imdb = store_imdb                    # True to store predictions with the IMDB format. Needed for evaluation
         
         if self.distance_func == 'def':
              self.match_func = self.distance_def
@@ -70,6 +74,7 @@ class REPP():
         if div == 0: return INF
         return 1 / div
     
+    # Computes de linking score between a pair of detections
     def distance_logreg(self, p1, p2):
         pair_features = get_pair_features(p1, p2, self.matching_feats)          #, image_size[0], image_size[1]
         score = self.clf_match.predict_proba(np.array([[ pair_features[col] for col in self.matching_feats ]]))[:,1]
@@ -119,7 +124,7 @@ class REPP():
      
         return pairs, unmatched_pairs
 
-    #Solve distance matrix and return a list of pair of linked detections from two consecutive frames
+    # Solve distance matrix and return a list of pair of linked detections from two consecutive frames
     def solve_distances_def(self, distances, maximization_problem):
         pairs = []
         if maximization_problem:
@@ -128,7 +133,6 @@ class REPP():
                 a,b = inds if len(inds[0]) == 1 else (inds[0][0], inds[1][0])
                 a,b = int(a), int(b)
                 pairs.append((a, b))
-    #             pairs.append((a-1, b-1))
                 distances[a,:] = -1
                 distances[:,b] = -1
         else:
@@ -195,6 +199,7 @@ class REPP():
         return tubelets
         
 
+    # Performs the re-scoring refinment
     def rescore_tubelets(self, tubelets):    
         for t_num in range(len(tubelets)):
             t_scores = [ p['scores'] for _,p in tubelets[t_num] ]
@@ -207,6 +212,7 @@ class REPP():
         return tubelets
     
     
+    # Performs de re-coordinating refinment
     def recoordinate_tubelets_full(self, tubelets, ms=-1):
         
         if ms == -1: ms = 40
@@ -224,6 +230,7 @@ class REPP():
         return tubelets
     
     
+    # Extracts predictions from tubelets
     def tubelets_to_predictions(self, tubelets_video, preds_format):
         
         preds, track_id_num = [], 0
@@ -242,8 +249,6 @@ class REPP():
                         elif preds_format == 'imdb':
                             preds.append('{} {} {} {} {} {} {}'.format(
                                         self.image_set['/'.join(pred['image_id'].split('/')[-2:])],
-#                                        pred['image_id'],
-                                        # image_set[p['image_id']],
                                         cat_id + 1,
                                         float(s),
                                         pred['bbox'][0], pred['bbox'][1], 
@@ -280,7 +285,6 @@ class REPP():
         return predictions_coco, predictions_imdb
 
 
-# %%
 
 
 
@@ -293,22 +297,21 @@ if __name__ == '__main__':
     parser.add_argument('--from_python_2', help='predictions filename', action='store_true')
     parser.add_argument('--evaluate', help='evaluate motion mAP', action='store_true')
     parser.add_argument('--annotations_filename', help='ILSVRC annotations. Needed for ILSVRC evaluation', required=False, type=str)
+    parser.add_argument('--path_dataset', help='path of the Imagenet VID dataset. Needed for ILSVRC evaluation', required=False, type=str)
     parser.add_argument('--store_coco', help='store processed predictions in coco format', action='store_true')
     parser.add_argument('--store_imdb', help='store processed predictions in imdb format', action='store_true')
     args = parser.parse_args()
     
     assert not (args.evaluate and args.annotations_filename is None), 'Annotations filename is required for ILSVRC evaluation'
+    assert not (args.evaluate and args.path_dataset is None), 'Dataset path is required for ILSVRC evaluation'
 
     print(' * Loading REPP cfg')
     repp_params = json.load(open(args.repp_cfg, 'r'))
     print(repp_params)
-#     annotations_filename = './data_annotations/annotations_val_skms-1_mvl2.txt'
     predictions_file_out = args.predictions_file.replace('.pckl', '_repp')
-    
     
     repp = REPP(**repp_params, annotations_filename=args.annotations_filename,
              store_coco=args.store_coco, store_imdb=args.store_imdb or args.evaluate)
-
 
     from tqdm import tqdm
     import sys
@@ -324,8 +327,6 @@ if __name__ == '__main__':
         total_preds_imdb += predictions_imdb
         if args.evaluate: pbar.update(len(video_preds))
 
-
-    
         
     if args.store_imdb:
         print(' * Dumping predictions with the IMDB format:', predictions_file_out + '_imdb.txt')
@@ -352,7 +353,8 @@ if __name__ == '__main__':
         imageset_filename_orig = '/mnt/hdd/datasets/imagenet_vid/ILSVRC2015/ImageSets/VID/val.txt'
         
         if os.path.isfile(stats_file_motion): os.remove(stats_file_motion)
-        stats = get_motion_mAP(args.annotations_filename, predictions_file_out + '_imdb.txt', stats_file_motion,
+        stats = get_motion_mAP(args.annotations_filename, args.path_dataset, 
+                               predictions_file_out + '_imdb.txt', stats_file_motion,
                                motion_iou_file_orig, imageset_filename_orig)
             
         print(stats)

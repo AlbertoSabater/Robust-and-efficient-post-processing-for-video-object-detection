@@ -7,8 +7,6 @@ Created on Thu Feb 28 12:53:31 2019
 """
 
 import os
-#os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID";
-#os.environ["CUDA_VISIBLE_DEVICES"] = "1";  
 
 import sys
 sys.path.append('keras_yolo3/')
@@ -19,7 +17,6 @@ import os
 import numpy as np
 import pandas as pd
 import keras_yolo3.train as ktrain
-#from keras.models import model_from_json
 import train_utils
 
 from tensorboard.backend.event_processing import event_accumulator
@@ -518,8 +515,6 @@ def main_evaluation_v2():
 	input_shape = (512,512) 			# 416 512 608
 	eval_train = True
 	
-	os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID";
-	os.environ["CUDA_VISIBLE_DEVICES"] = "0";  
 	import tensorflow as tf
 	import keras.backend.tensorflow_backend as ktf
 
