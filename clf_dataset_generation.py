@@ -24,16 +24,11 @@ import sys
 import numpy as np
 import math
 from scipy import signal
-from keras import backend as K
 from functools import reduce
 import json
 
 import copy
 import argparse
-
-
-# TODO: Add scores as classification features
-# TODO: Añadir data augmentation
 
 
 # =============================================================================

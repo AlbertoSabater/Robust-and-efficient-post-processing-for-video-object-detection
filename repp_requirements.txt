@@ -2,3 +2,4 @@ scikit-learn
 scipy
 tqdm
 pandas
+opencv-python==4.2.0.32
