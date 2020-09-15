@@ -22,11 +22,11 @@ Its dependencies can be found the the _requirements.txt_ file.
 
 ## Quick usage guide
 
-Video detections must be stored with pickle in the following format:
+Video detections must be stored with pickle as tuples (video_name, {frame_dets}) as following:
 
 ```
-("video_name", {"frame_001": [ det_1, det_2, ..., det_N ],
-                "frame_002": [ det_1, det_2, ..., det_M ]},
+("video_name", {"000001": [ det_1, det_2, ..., det_N ],
+                "000002": [ det_1, det_2, ..., det_M ]},
                 ...)
 ```
 
@@ -41,7 +41,7 @@ det_1: {'image_id': image_id,     # Same as the used in ILSVRC if applies
         'bbox_center': (x,y) }    # Relative bounding box center
 ```
 
-The _bbox_center_ is bounded by 0 and 1 and referes to the center of the detection when the image has been padded vertically or horizontally to fit a square shape. 
+_bbox_center_ coordinates are bounded by 0 and 1 and referes to the center of the detection when the image has been padded vertically or horizontally to fit a square shape. 
 
 Check [this code](https://github.com/AlbertoSabater/Robust-and-efficient-post-processing-for-video-object-detection/blob/master/demos/YOLOv3/get_repp_predictions.py) for a better insight about the predictions format.
 
@@ -49,7 +49,7 @@ Post-processed detections can be saved both with the COCO or IMDB format.
 
 
 ```
-python REPP.py --repp_cfg cfg.json --predictions_file predictions_fil.pckl --store_coco --store_imdb
+python REPP.py --repp_cfg cfg.json --predictions_file predictions_file.pckl --store_coco --store_imdb
 ```
 
 As a REPP configuration file, you can use either _fgfa_repp_cfg.json_ or _yolo_repp_cfg.json_. The first one works better with high performing detectors such as SELSA or FGFA and the second one works better for lower quality detectors. We recommend to set _appearance_matching_ to false in the config file since it requires a non-trivial training of extra models and it's not mandatory for the performance bossting. If needed, the following config parameters can be tunned:
@@ -63,7 +63,17 @@ Below you will find instructions to perform any video predictions with YOLOv3 an
 
 ## Demos
 
-In order to reproduce the results of the paper, you can download the predictions of the different models from the following [link](https://drive.google.com/file/d/11SW3vqJthMtvW7tusVLgqNvRVgW4R90x/view?usp=sharing) and locate them in the project folder as structured in the downloaded folder. 
+In order to reproduce the results of the paper, you can download the predictions of the different models from the following [link](https://drive.google.com/file/d/11SW3vqJthMtvW7tusVLgqNvRVgW4R90x/view?usp=sharing) and locate them in the project folder as structured in the downloaded zip folder. 
+
+Imagenet VID dataset must be downloaded and stored with the following folder structure:
+```
+/path/to/dataset/ILSVRC2015/
+/path/to/dataset/ILSVRC2015/Annotations/DET
+/path/to/dataset/ILSVRC2015/Annotations/VID
+/path/to/dataset/ILSVRC2015/Data/DET
+/path/to/dataset/ILSVRC2015/Data/VID
+/path/to/dataset/ILSVRC2015/ImageSets
+```
 
 Following commands will apply the REPP post-processing and will evaluate the results by calculating the mean Average Precision for different object motions:
 
@@ -81,16 +91,18 @@ python REPP.py --repp_cfg selsa_repp_cfg.json --predictions_file './demos/Sequen
 > {'mAP_total': 0.8421329795837483, 'mAP_slow': 0.8871784038276325, 'mAP_medium': 0.8332090469178383, 'mAP_fast': 0.7109387713303483}
 ```
 
-Instead of downloaded the base predictions, you can also compute them. To do so, you must install the proper dependencies for each model as specified in the original model repositories ([YOLOv3](https://github.com/AlbertoSabater/Robust-and-efficient-post-processing-for-video-object-detection/tree/master/demos/YOLOv3), [FGFA](https://github.com/guanfuchen/Flow-Guided-Feature-Aggregation), [SELSA](https://github.com/happywu/Sequence-Level-Semantics-Aggregation)). You must also download their weights and config files from the following [link](https://drive.google.com/file/d/19aRWqMytRRq3ukV5h3lNAghIgs4JCpbz/view?usp=sharing) and locate them in the project folder as structured in the downloaded folder. Then execute the following commands:
+Instead of download the base predictions, you can also compute them. To do so, you must __install the proper dependencies__ for each model as specified in the original model repositories ([YOLOv3](https://github.com/AlbertoSabater/Robust-and-efficient-post-processing-for-video-object-detection/tree/master/demos/YOLOv3), [FGFA](https://github.com/guanfuchen/Flow-Guided-Feature-Aggregation), [SELSA](https://github.com/happywu/Sequence-Level-Semantics-Aggregation)). You must also download their weights and config files from the following [link](https://drive.google.com/file/d/19aRWqMytRRq3ukV5h3lNAghIgs4JCpbz/view?usp=sharing) and locate them in the project folder as structured in the downloaded zip file. Then execute the following commands:
 
 ```
 # YOLO
 cd demos/YOLOv3/
-python get_repp_predictions.py --yolo_path ./pretrained_models/ILSVRC/1203_1758_model_8/ --repp_format --add_appearance --from_annotations ../../data_annotations/annotations_val_skms-1_mvl2.txt --dataset_path /home/asabater/projects/ILSVRC2015/Data/VID/
+python get_repp_predictions.py --yolo_path ./pretrained_models/ILSVRC/1203_1758_model_8/ --repp_format --add_appearance --from_annotations ../../data_annotations/annotations_val_skms-1_mvl2.txt --dataset_path /path/to/dataset/ILSVRC2015/Data/VID/
+
 # FGFA
 cd demos/Flow-Guided-Feature-Aggregation/fgfa_rfcn/
 python get_repp_predictions.py  --det_path 'path_to_dataset/ILSVRC2015/'
 # SELSA
+
 cd demos/Sequence-Level-Semantics-Aggregation/
 python experiments/selsa/get_repp_predictions.py --dataset_path 'path_to_dataset/ILSVRC2015/'
 ```
@@ -103,22 +115,24 @@ REPP can be also applied to the predictions from any video as long as they have 
 # Extract YOLOv3 predictions
 cd demos/YOLOv3/
 python get_repp_predictions.py --yolo_path ./pretrained_models/ILSVRC/1203_1758_model_8/ --repp_format --add_appearance --from_video ./test_images/video_1.mp4
+
+# Apply REPP
 cd ../..
 python REPP.py --repp_cfg yolo_repp_cfg.json --predictions_file './demos/YOLOv3/predictions/preds_repp_app_video_1.pckl' --store_coco
 ```
 
 
-## Train REPP matching model on ILSVRC
+## REPP matching model training on ILSVRC
 
-As described in the paper, the model that links detections accross frames is based on a Logistic Regression trained with data from ILSVRC. Following steps are needed to reproduce the results:
+The present project includes trained linking models both to perform the detection matching with and without appearance descriptors. These models have been trained with data from Imagenet VID, but they are able to improve detections for any other dataset or custom video. These Logistic Regression models have been trained using the following steps, that can be adapted to any other custom dataset:
 
 1. Generate annotations for the Logistic Regression training, based on triplet tuplets (Anchor, Positive, Negative):
 ```
-python create_triplet_ilsvrc_annotations.py --path_dataset '/home/asabater/projects/ILSVRC2015/'
+python create_triplet_ilsvrc_annotations.py --path_dataset '/path/to/dataset/ILSVRC2015/'
 ```
 2. Generate matching features from the annotations:
 ```
-python clf_dataset_generation.py --path_dataset '/home/asabater/projects/ILSVRC2015/' --add_appearance
+python clf_dataset_generation.py --path_dataset '/path/to/dataset/ILSVRC2015/' --add_appearance
 ```
 3. Train and store the Logistic Regression model:
 ```
