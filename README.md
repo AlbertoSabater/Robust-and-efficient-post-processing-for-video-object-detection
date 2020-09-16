@@ -2,7 +2,7 @@
 
 [[Paper](http://webdiis.unizar.es/~anacris/papers/20IROS_Sabater.pdf)]
 
-__REPP__ is a learning based post-processing method to improve video object detections from any object detector. REPP links detection accross frames by evaluating their similarity and refines their classification and location to suppress false positives and recover misdetections.
+__REPP__ is a learning based post-processing method to improve video object detections from any object detector. REPP links detections accross frames by evaluating their similarity and refines their classification and location to suppress false positives and recover misdetections.
 
 <p align="center"><img src="./figures/pipeline.png" alt="Post-processing pipeline" width="450"/></p>
 
@@ -15,7 +15,7 @@ REPP improves video detections both for specific Image and Video Object Detector
 
 REPP has been tested with Python 3.6.
 
-Its dependencies can be found the the _repp_requirements.txt_ file.
+Its dependencies can be found in _repp_requirements.txt_ file.
 
 ```pip install -r repp_requirements.txt```
 
@@ -49,14 +49,14 @@ Post-processed detections can be saved both with the COCO or IMDB format.
 
 
 ```
-python REPP.py --repp_cfg cfg.json --predictions_file predictions_file.pckl --store_coco --store_imdb
+python REPP.py --repp_cfg ./REPP_cfg/cfg.json --predictions_file predictions_file.pckl --store_coco --store_imdb
 ```
 
 As a REPP configuration file, you can use either _fgfa_repp_cfg.json_ or _yolo_repp_cfg.json_. The first one works better with high performing detectors such as SELSA or FGFA and the second one works better for lower quality detectors. We recommend to set _appearance_matching_ to false in the config file since it requires a non-trivial training of extra models and it's not mandatory for the performance bossting. If needed, the following config parameters can be tunned:
 
 * _min_tubelet_score_ and _min_pred_score_: threshold used to suppress low-scoring detections. Higher values speeds up the post-processing execution.
 * _clf_thr_: threshold to suppress low-scoring detections linking. Lower values will lead to more False Positives and higher ones will lead to fewer detections.
-* _recoordinate_std_: lower values lead to a more aggressive recoordinating, lower values to a smoother one.
+* _recoordinate_std_: higher values lead to a more aggressive recoordinating, lower values to a smoother one.
 
 Below you will find instructions to perform any video predictions with YOLOv3 and apply REPP.
 
@@ -79,15 +79,15 @@ Following commands will apply the REPP post-processing and will evaluate the res
 
 ```
 # YOLO
-python REPP.py --repp_cfg yolo_repp_cfg.json --predictions_file './demos/YOLOv3/predictions/base_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_ILSVRC.txt  --path_dataset /path/to/dataset/ILSVRC2015/ --store_coco --store_imdb
+python REPP.py --repp_cfg ./REPP_cfg/yolo_repp_cfg.json --predictions_file './demos/YOLOv3/predictions/base_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_ILSVRC.txt  --path_dataset /path/to/dataset/ILSVRC2015/ --store_coco --store_imdb
 > {'mAP_total': 0.7506216640807263, 'mAP_slow': 0.825347229618856, 'mAP_medium': 0.742908326433008, 'mAP_fast': 0.5657881762511975}
 
 # FGFA
-python REPP.py --repp_cfg fgfa_repp_cfg.json --predictions_file './demos/Flow-Guided-Feature-Aggregation/predictions/base_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_ILSVRC.txt --path_dataset /path/to/dataset/ILSVRC2015/ --store_coco --store_imdb
+python REPP.py --repp_cfg ./REPP_cfg/fgfa_repp_cfg.json --predictions_file './demos/Flow-Guided-Feature-Aggregation/predictions/base_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_ILSVRC.txt --path_dataset /path/to/dataset/ILSVRC2015/ --store_coco --store_imdb
 > {'mAP_total': 0.8009014265948871, 'mAP_slow': 0.8741923949671497, 'mAP_medium': 0.7909183123072739, 'mAP_fast': 0.6137783055850773}
 
 # SELSA
-python REPP.py --repp_cfg selsa_repp_cfg.json --predictions_file './demos/Sequence-Level-Semantics-Aggregation/predictions/old_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_ILSVRC.txt --path_dataset /path/to/dataset/ILSVRC2015/ --store_coco --store_imdb
+python REPP.py --repp_cfg ./REPP_cfg/selsa_repp_cfg.json --predictions_file './demos/Sequence-Level-Semantics-Aggregation/predictions/old_preds.pckl' --evaluate --annotations_filename ./data_annotations/annotations_val_ILSVRC.txt --path_dataset /path/to/dataset/ILSVRC2015/ --store_coco --store_imdb
 > {'mAP_total': 0.8421329795837483, 'mAP_slow': 0.8871784038276325, 'mAP_medium': 0.8332090469178383, 'mAP_fast': 0.7109387713303483}
 ```
 
@@ -118,7 +118,7 @@ python get_repp_predictions.py --yolo_path ./pretrained_models/ILSVRC/1203_1758_
 
 # Apply REPP
 cd ../..
-python REPP.py --repp_cfg yolo_repp_cfg.json --predictions_file './demos/YOLOv3/predictions/preds_repp_app_video_1.pckl' --store_coco
+python REPP.py --repp_cfg ./REPP_cfg/yolo_repp_cfg.json --predictions_file './demos/YOLOv3/predictions/preds_repp_app_video_1.pckl' --store_coco
 ```
 
 
@@ -142,5 +142,13 @@ python train_clf_model.py --add_appearance
 Previous steps include appearance features calculated from a pretrained YOLOv3 model. If you are going to use a different dataset or detection model, it's recommended to omit the _--add_appearance_ parameter.
 
 
-
+## Citation
+```
+@inproceedings{sabater2020repp,
+  title={Robust and efficient post-processing for Video Object Detection},
+  author={Alberto Sabater, Luis Montesano, Ana C. Murillo},
+  booktitle={International Conference of Intelligent Robots and Systems (IROS)},
+  year={2020}
+}
+```
 
