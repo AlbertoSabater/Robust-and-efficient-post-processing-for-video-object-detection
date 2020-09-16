@@ -1,18 +1,29 @@
 # Keras YOLO v3
 
-## Introduction
+## Project Features
+
+- Spatial Pyramid Pooling (SPP)
+- Multi-scale training
+- OpenCv data augmentation (increases learning speed)
+- mAP Evaluation (complete, per cateogry and per subdataset (if exists))
+- Loss components (xy, wh, class, confidence_obj, confidence_noobj) weighting
+- Loss components logging on TensorBoard
+- Custom anchors generation
+
+## Introduction and installation
 
 A Keras implementation of YOLOv3 (Tensorflow backend) inspired by [qqwweee/keras-yolo3](https://github.com/qqwweee/keras-yolo3).
 
-**Important.** To use this repo you must make sure that [qqwweee/keras-yolo3](https://github.com/qqwweee/keras-yolo3) project has been properly downloaded.
+Present project has been tested with Python 3.6. Following command line will install the proper python dependencies:
+
 ```
-git clone https://github.com/AlbertoSabater/Keras-YOLO-v3
-cd Keras-YOLO-v3
-git submodule update --init --recursive
+pip install -r yolo_requirements.txt
 ```
 ---
 
 ## Download pretrained models and convert to Keras
+
+Ready to use YOLO models trained with different datasets are available [here](https://drive.google.com/drive/folders/15slmuh2PiSBthORnob49uWywrZNI7Wx9?usp=sharing). Optionally you can also convert original YOLO models from darknet to tensorflow with the following steps:
 
 1. Download weights and .cfg file from [YOLO website](http://pjreddie.com/darknet/yolo/) and store them in `./weights`.
 2. Convert the weights to a Keras model and store it in `./base_models`.
@@ -43,32 +54,15 @@ python keras_yolo3/convert.py weights/yolo-tiny.cfg weights/yolo-tiny.weights ba
 
 ## Testing
 
-Use `eyolo_prediction.py` to predict the bounding boxes of a image or a video using a trained model.
-
+Following code shows how to compute YOLO predictions from any video.
 ```
-usage: eyolo_prediction.py [-h] --model MODEL --anchors ANCHORS --classes
-                           CLASSES --input INPUT [--image] [--spp]
-                           [--output_path OUTPUT_PATH]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --model MODEL         path to model weight file
-  --anchors ANCHORS     path to anchor definitions
-  --classes CLASSES     path to class definitions
-  --input INPUT         Video/image input path
-  --image               Image detection mode
-  --spp                 use this option if the model uses SPP
-  --output_path OUTPUT_PATH
-                        output file where to store the result
+# Extract YOLOv3 predictions
+python get_repp_predictions.py --yolo_path ./pretrained_models/ILSVRC/1203_1758_model_8/ --repp_format --add_appearance --from_video ./test_images/video_1.mp4
 ```
 
-Image prediction sample:
+Following code shows how to compute YOLO predictions from a set of annotations:
 ```
-python eyolo_prediction.py --model base_models/yolo.h5 --anchors base_models/yolo_anchors.txt --classes base_models/coco_classes.txt --image --input test_images/image_1.jpg --output_path image_prediction.png
-```
-Video prediction sample:
-```
-python eyolo_prediction.py --model base_models/yolo.h5 --anchors base_models/yolo_anchors.txt --classes base_models/coco_classes.txt --input test_images/video_1.mp4 --output_path video_prediction.mp4
+python get_repp_predictions.py --yolo_path ./pretrained_models/ILSVRC/1203_1758_model_8/ --from_annotations ../../data_annotations/annotations_val_ILSVRC.txt --dataset_path /path/to/dataset/ILSVRC2015/Data/VID/
 ```
 
 
