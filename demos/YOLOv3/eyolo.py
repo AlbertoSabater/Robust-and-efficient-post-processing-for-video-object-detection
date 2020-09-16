@@ -36,15 +36,18 @@ import json
 
 
 # Load a YOLO model and its weights from a model folder
+# Set downsample_rate to extract correspondings feature maps from YOLO
 def load_yolo_model_raw(model_folder, path_weights, image_size, scores_vector,
 						downsample_rate, score=0.005, iou_thr=0.5, max_boxes=20):
 
 	train_params = json.load(open(model_folder + 'train_params.json', 'r'))
 	
 	if scores_vector:
+        # Detection scores as given as a vector of class confidences
 		raw_eval = 'raw_scores'
 		if downsample_rate is not None: raw_eval += '_{}'.format(downsample_rate)
 	else:
+        # Each detection has a single score and category
 		raw_eval = 'def'
 		
 	
@@ -127,7 +130,7 @@ class EYOLO(YOLO):
 			self.yolo_model = multi_gpu_model(self.yolo_model, gpus=self.gpu_num)
 			
 
-		if not hasattr(self, 'raw_eval') or self.raw_eval == 'def':
+		if not hasattr(self, 'raw_eval') or self.raw_eval == 'def':   # Each detection has a single score and category
 			return yolo_eval(self.yolo_model.output, self.anchors,
 					len(self.class_names), self.input_image_shape,
 					score_threshold=self.score, iou_threshold=self.iou)
@@ -140,7 +143,7 @@ class EYOLO(YOLO):
 # 					len(self.class_names), self.input_image_shape,
 # 					score_threshold=self.score)
 # 		elif 'raw_scores_' in self.raw_eval: 		# ej. raw_scores_16_32
-		elif 'raw_scores' in self.raw_eval: 		# ej. raw_scores_16_32
+		elif 'raw_scores' in self.raw_eval: 		# ej. raw_scores_16_32  # Detection scores as given as a vector of class confidences
 			return yolo_eval_raw_scores_feats(self.yolo_model.output, self.anchors,
 					len(self.class_names), self.input_image_shape,
 					list(map(int, self.raw_eval.split('_')[2:])),

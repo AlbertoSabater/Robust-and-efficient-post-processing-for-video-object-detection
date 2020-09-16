@@ -71,6 +71,7 @@ def remove_null_trainings(path_results, dataset_name):
 
 def get_best_weights(model_folder):
 	files = [ f for f in os.listdir(model_folder + '/weights/') if f.startswith('ep') ]
+	if len(files) == 0: return model_folder + 'weights/weights.h5'
 	val_losses = [ [ float(v[8:]) for v in f[:-3].split('-') if v.startswith('val_loss') ][0] for f in files ]
 	model_weights = model_folder + 'weights/' + files[val_losses.index(min(val_losses))]
 	return model_weights

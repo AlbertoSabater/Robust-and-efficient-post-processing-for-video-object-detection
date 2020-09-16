@@ -18,18 +18,9 @@ from keras.layers import Input, Reshape
 from keras.models import model_from_json
 import numpy as np
 from ROI_pooling_frcnn import RoiPoolingConv
-import cv2
 from keras import backend as K
 from tqdm import tqdm
 import json
-
-import sys
-sys.path.append('keras_yolo3/')
-from yolo3.model import DarknetConv2D_BN_Leaky
-from yolo3.utils import compose
-
-import tensorflow as tf
-import keras.backend.tensorflow_backend as ktf
 
 
 
