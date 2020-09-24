@@ -2,7 +2,7 @@
 
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/robust-and-efficient-post-processing-for/video-object-detection-on-imagenet-vid)](https://paperswithcode.com/sota/video-object-detection-on-imagenet-vid?p=robust-and-efficient-post-processing-for)
 
-[[Paper](http://webdiis.unizar.es/~anacris/papers/20IROS_Sabater.pdf)]
+[[Paper](https://arxiv.org/abs/2009.11050)]
 
 __REPP__ is a learning based post-processing method to improve video object detections from any object detector. REPP links detections accross frames by evaluating their similarity and refines their classification and location to suppress false positives and recover misdetections.
 
