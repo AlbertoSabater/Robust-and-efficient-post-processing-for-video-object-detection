@@ -12,7 +12,7 @@
 
 ## Introduction and installation
 
-A Keras implementation of YOLOv3 (Tensorflow backend) inspired by [qqwweee/keras-yolo3](https://github.com/qqwweee/keras-yolo3).
+A Keras implementation of YOLOv3 (Tensorflow backend) based on [qqwweee/keras-yolo3](https://github.com/qqwweee/keras-yolo3) and [AlbertoSabater/Keras-YOLO-v3](https://github.com/AlbertoSabater/Keras-YOLO-v3).
 
 Present project has been tested with Python 3.6. Following command line will install the proper python dependencies:
 
