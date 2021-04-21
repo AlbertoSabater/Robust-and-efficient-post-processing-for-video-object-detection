@@ -23,7 +23,7 @@ pip install -r yolo_requirements.txt
 
 ## Download pretrained models and convert to Keras
 
-Ready to use YOLO models trained with different datasets are available [here](https://drive.google.com/drive/folders/15slmuh2PiSBthORnob49uWywrZNI7Wx9?usp=sharing). Optionally you can also convert original YOLO models from darknet to tensorflow with the following steps:
+Ready to use YOLO models (COCO and ILSVRC weights) trained with different datasets are available [here](https://drive.google.com/drive/folders/15slmuh2PiSBthORnob49uWywrZNI7Wx9?usp=sharing). Optionally you can also convert original YOLO models from darknet to tensorflow with the following steps:
 
 1. Download weights and .cfg file from [YOLO website](http://pjreddie.com/darknet/yolo/) and store them in `./weights`.
 2. Convert the weights to a Keras model and store it in `./base_models`.
