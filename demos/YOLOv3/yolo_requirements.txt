@@ -5,5 +5,5 @@ tqdm
 pandas
 opencv-python==4.2.0.32
 tensorflow-gpu==1.13.1
-pycocotools==2.0
+pycocotools==2.0.2
 keras==2.2.4
