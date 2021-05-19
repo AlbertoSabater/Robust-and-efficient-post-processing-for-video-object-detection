@@ -182,11 +182,15 @@ def get_annotations(bboxes, path_dataset, mode, num_samples, max_frame_dist):
 		anns.append(ann)
 
 
-	filename = './data_annotations/triplet_annotations/triplet_annotations_{}.txt'.format(mode)
-	with open(filename, 'w') as f:
+	output_directory = './data_annotations/triplet_annotations'
+	if not os.path.exists(output_directory):
+		os.makedirs(output_directory)
+	filename = 'triplet_annotations_{}.txt'.format(mode)
+	file_path = os.path.join(output_directory, filename)
+	with open(file_path, 'w') as f:
 		for ann in anns: f.write(ann + '\n')
 	
-	print('saved:', filename)	
+	print('saved:', file_path)
 	
 	return bboxes_df, anns
 
