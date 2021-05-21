@@ -350,7 +350,7 @@ if __name__ == '__main__':
         
         stats_file_motion = predictions_file_out.replace('preds', 'stats').replace('.txt', '.json')
         motion_iou_file_orig = './ObjectDetection_mAP_by_motion/imagenet_vid_groundtruth_motion_iou.mat'
-        imageset_filename_orig = '/mnt/hdd/datasets/imagenet_vid/ILSVRC2015/ImageSets/VID/val.txt'
+        imageset_filename_orig = os.path.join(args.path_dataset, 'ImageSets/VID/val.txt')
         
         if os.path.isfile(stats_file_motion): os.remove(stats_file_motion)
         stats = get_motion_mAP(args.annotations_filename, args.path_dataset, 
