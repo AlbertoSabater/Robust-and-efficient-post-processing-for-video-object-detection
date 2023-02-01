@@ -65,7 +65,7 @@ Below you will find instructions to perform any video predictions with YOLOv3 an
 
 ## Demos
 
-In order to reproduce the results of the paper, you can download the predictions of the different models from the following [link](https://drive.google.com/file/d/11SW3vqJthMtvW7tusVLgqNvRVgW4R90x/view?usp=sharing) and locate them in the project folder as structured in the downloaded zip folder. 
+In order to reproduce the results of the paper, you can download the predictions of the different models from the following [link](https://unizares-my.sharepoint.com/:u:/g/personal/asabater_unizar_es/EdtTvM9EklBCsAeLIhwZSvIB4XZQPLTo3h4QU2QFKpb92w?e=dNGY6I) and locate them in the project folder as structured in the downloaded zip folder. 
 
 Imagenet VID dataset must be downloaded and stored with the following folder structure:
 ```
@@ -93,7 +93,7 @@ python REPP.py --repp_cfg ./REPP_cfg/selsa_repp_cfg.json --predictions_file './d
 > {'mAP_total': 0.8421329795837483, 'mAP_slow': 0.8871784038276325, 'mAP_medium': 0.8332090469178383, 'mAP_fast': 0.7109387713303483}
 ```
 
-Instead of download the base predictions, you can also compute them. To do so, you must __install the proper dependencies__ for each model as specified in the original model repositories ([YOLOv3](https://github.com/AlbertoSabater/Robust-and-efficient-post-processing-for-video-object-detection/tree/master/demos/YOLOv3), [FGFA](https://github.com/guanfuchen/Flow-Guided-Feature-Aggregation), [SELSA](https://github.com/happywu/Sequence-Level-Semantics-Aggregation)). You must also download their weights and config files from the following [link](https://drive.google.com/file/d/19aRWqMytRRq3ukV5h3lNAghIgs4JCpbz/view?usp=sharing) and locate them in the project folder as structured in the downloaded zip file. Then execute the following commands:
+Instead of download the base predictions, you can also compute them. To do so, you must __install the proper dependencies__ for each model as specified in the original model repositories ([YOLOv3](https://github.com/AlbertoSabater/Robust-and-efficient-post-processing-for-video-object-detection/tree/master/demos/YOLOv3), [FGFA](https://github.com/guanfuchen/Flow-Guided-Feature-Aggregation), [SELSA](https://github.com/happywu/Sequence-Level-Semantics-Aggregation)). You must also download their weights and config files from the following [link](https://unizares-my.sharepoint.com/:u:/g/personal/asabater_unizar_es/Ecbuh0leCgdPg0Skl0LYoAYBgAURhldr-6Ng5cgSxBGYvA?e=Ufvn3Q) and locate them in the project folder as structured in the downloaded zip file. Then execute the following commands:
 
 ```
 # YOLO
